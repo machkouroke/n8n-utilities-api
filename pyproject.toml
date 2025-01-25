@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "comparestring"
+version = "0.1.0"
+description = ""
+authors = ["machkouroke <machkour20.mo1@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.32.3"
+fuzzywuzzy = "^0.18.0"
+python-levenshtein = "^0.26.1"
+fastapi = "^0.115.0"
+uvicorn = "^0.32.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
