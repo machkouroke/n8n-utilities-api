@@ -1,6 +1,9 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
+
+from models.FootballAPI import Historical
 
 
 class Outcome(BaseModel):
@@ -26,3 +29,4 @@ class Match(BaseModel):
     home_team: str
     away_team: str
     bookmakers: list[Bookmaker]
+    historical: Optional[Historical]

@@ -1,8 +1,10 @@
+from datetime import datetime
 from pprint import pprint
 
 import requests
 from fuzzywuzzy import fuzz
 
+from models.FootballAPI import MatchAPI
 from models.League import League
 
 leagues = [
@@ -67,11 +69,15 @@ def get_history_data(teams_id: str):
     headers = {
         'X-Auth-Token': '842e19d260114497a718642c69858dfa'
     }
+
     response = requests.request("GET", url, headers=headers)
-    return sorted(response.json()['matches'], key=lambda x: x['utcDate'])
+    last_five_matches = \
+        sorted(response.json()['matches'], key=lambda x: datetime.strptime(x['utcDate'], '%Y-%m-%dT%H:%M:%S%z'),
+               reverse=True)[:5]
+    return last_five_matches
+
 
 if __name__ == "__main__":
-    # mapping_table = create_mapping_table(leagues)
-    # pprint(mapping_table)
-    # print(len(mapping_table))
-    pprint(get_history_data('66'))
+    # data = get_history_data('78')
+    # pprint(data[0])
+    pprint(MatchAPI.summary('78'))
