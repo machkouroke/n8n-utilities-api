@@ -68,7 +68,7 @@ def get_history_data(teams_id: str):
         'X-Auth-Token': '842e19d260114497a718642c69858dfa'
     }
     response = requests.request("GET", url, headers=headers)
-    return response.json()
+    return sorted(response.json()['matches'], key=lambda x: x['utcDate'])
 
 if __name__ == "__main__":
     # mapping_table = create_mapping_table(leagues)
