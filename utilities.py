@@ -3,13 +3,13 @@ from pprint import pprint
 import requests
 from fuzzywuzzy import fuzz
 
-from model import League
+from models.League import League
 
 leagues = [
-    {"league": "La liga", "api_key": "soccer_spain_la_liga", "api_id": 2014},
-    {"league": "Premier League", "api_key": "soccer_england_league1", "api_id": 2021},
-    {"league": "Bundesliga", "api_key": "soccer_germany_bundesliga", "api_id": 2002},
-    {"league": "Serie A", "api_key": "soccer_italy_serie_a", "api_id": 2019},
+    # {"league": "La liga", "api_key": "soccer_spain_la_liga", "api_id": 2014},
+    # {"league": "Premier League", "api_key": "soccer_england_league1", "api_id": 2021},
+    # {"league": "Bundesliga", "api_key": "soccer_germany_bundesliga", "api_id": 2002},
+    League(**{"league": "Serie A", "api_key": "soccer_italy_serie_a", "api_id": 2019})
 ]
 
 
@@ -58,11 +58,20 @@ def create_mapping_table(leagues: list[League]):
                     best_match = football_team
             if highest_ratio > 70:
                 mapping_table[odds_team['team_name']] = best_match['team_name']
-
     return mapping_table
 
 
+def get_history_data(teams_id: str):
+    url = f"https://api.football-data.org/v4/teams/{teams_id}/matches?status=FINISHED"
+
+    headers = {
+        'X-Auth-Token': '842e19d260114497a718642c69858dfa'
+    }
+    response = requests.request("GET", url, headers=headers)
+    return response.json()
+
 if __name__ == "__main__":
-    mapping_table = create_mapping_table(leagues)
-    pprint(mapping_table)
-    print(len(mapping_table))
+    # mapping_table = create_mapping_table(leagues)
+    # pprint(mapping_table)
+    # print(len(mapping_table))
+    pprint(get_history_data('66'))

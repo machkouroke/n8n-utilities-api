@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from model import League
+from models.League import League
 from utilities import create_mapping_table
 
 router = APIRouter()
@@ -18,5 +18,17 @@ async def get_mapping_table(leagues: list[League]):
         "detail": {
             "mapping_table": mapping_table,
             "nb_teams_mapped": len(mapping_table)
+        }
+    }
+
+@router.get('/historical-data/{teams_id}')
+async def get_historical_data():
+    """
+    Get the historical data of the matches
+    :return: the historical data
+    """
+    return {
+        "detail": {
+            "historical_data": "data"
         }
     }
