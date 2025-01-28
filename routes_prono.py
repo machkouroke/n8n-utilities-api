@@ -7,51 +7,25 @@ from psycopg2 import sql
 
 router = APIRouter()
 
-db_config = {
-    'dbname': 'leagues',  # Remplacez par le nom de votre base de données
-    'user': 'avnadmin',  # Remplacez par votre nom d'utilisateur
-    'password': 'AVNS_yjrlufaPbvwZdzs8XrY',  # Remplacez par votre mot de passe
-    'host': 'n8n-machkouroke-a3c1.b.aivencloud.com',  # Remplacez par l'hôte de votre base de données
-    'port': 28399  # Remplacez par le port de votre base de données
-}
+leagues = [
+    League(**{"league": "La liga", "api_key": "soccer_spain_la_liga", "api_id": 2014}),
+    League(**{"league": "Premier League", "api_key": "soccer_england_league1", "api_id": 2021}),
+    League(**{"league": "Bundesliga", "api_key": "soccer_germany_bundesliga", "api_id": 2002}),
+    League(**{"league": "Serie A", "api_key": "soccer_italy_serie_a", "api_id": 2019})
+]
 
 
 @router.get("leagues")
 async def get_leagues():
-    connection = None
-    cursor = None
-    try:
-        # Établir la connexion
-        connection = psycopg2.connect(**db_config)
-        cursor = connection.cursor()
-
-        # Requête SQL pour récupérer les données
-        query = sql.SQL("SELECT name, odd_api_key, api_football_key FROM leagues;")
-        cursor.execute(query)
-
-        # Récupérer les résultats et les convertir en liste de dictionnaires
-        columns = [desc[0] for desc in cursor.description]  # Récupérer les noms des colonnes
-        leagues = [dict(zip(columns, row)) for row in cursor.fetchall()]
-
-        return {
-            "detail": {
-                "leagues": leagues,
-                "nb_leagues": len(leagues)
-            }
+    """
+    Get the list of leagues
+    :return: the list of leagues
+    """
+    return {
+        "detail": {
+            "leagues": leagues
         }
-    except (Exception, psycopg2.DatabaseError) as error:
-        return {
-            "detail": {
-                "error": "Erreur lors de la récupération des données"
-            }}
-
-    finally:
-        # Fermer la connexion
-        if connection:
-            cursor.close()
-            connection.close()
-            print("Connexion à la base de données fermée.")
-
+    }
 
 @router.post("/mapping-table")
 async def get_mapping_table(leagues: list[League]):

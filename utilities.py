@@ -8,12 +8,7 @@ from fuzzywuzzy import fuzz
 from models.FootballAPI import MatchAPI
 from models.League import League
 
-leagues = [
-    # {"league": "La liga", "api_key": "soccer_spain_la_liga", "api_id": 2014},
-    # {"league": "Premier League", "api_key": "soccer_england_league1", "api_id": 2021},
-    # {"league": "Bundesliga", "api_key": "soccer_germany_bundesliga", "api_id": 2002},
-    League(**{"league": "Serie A", "api_key": "soccer_italy_serie_a", "api_id": 2019})
-]
+
 cache = cachetools.TTLCache(maxsize=100, ttl=86400)  # 86400 secondes = 1 jour
 
 def get_api_odds_teams(ligue: str):

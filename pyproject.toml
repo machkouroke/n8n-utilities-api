@@ -13,7 +13,6 @@ python-levenshtein = "^0.26.1"
 fastapi = "^0.115.0"
 uvicorn = "^0.32.0"
 cachetools = "^5.5.1"
-psycopg2 = "^2.9.10"
 
 
 [build-system]
