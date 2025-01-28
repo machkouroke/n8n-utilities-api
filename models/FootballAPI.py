@@ -32,6 +32,7 @@ class Competition(BaseModel):
     type: str
     nationality: Optional[str] = None
 
+
 class Referee(BaseModel):
     id: int
     name: str
@@ -86,7 +87,7 @@ class MatchAPI(BaseModel):
     utcDate: datetime
 
     @staticmethod
-    def summary(teams_id: str, n=5):
+    def summary(teams_id: int, n=5):
         """
         Give the summaries of the last n matches
         :param teams_id:  Team id
