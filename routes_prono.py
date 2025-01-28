@@ -2,8 +2,6 @@ from fastapi import APIRouter
 
 from models.League import League
 from utilities import create_mapping_table
-import psycopg2
-from psycopg2 import sql
 
 router = APIRouter()
 

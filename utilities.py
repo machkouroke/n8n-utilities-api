@@ -1,7 +1,6 @@
 from datetime import datetime
 from pprint import pprint
 
-import cachetools
 import requests
 from fuzzywuzzy import fuzz
 
@@ -9,7 +8,6 @@ from models.FootballAPI import MatchAPI
 from models.League import League
 
 
-cache = cachetools.TTLCache(maxsize=100, ttl=86400)  # 86400 secondes = 1 jour
 
 def get_api_odds_teams(ligue: str):
     API_KEY = '1c4d52bcc762be6253526a6cb2179978'
