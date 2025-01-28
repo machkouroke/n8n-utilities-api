@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 
 class League(BaseModel):
-    league: str
-    api_key: str
-    api_id: int
+    name: str
+    odds_api_id: str
+    foot_api_free_id: int
+    foot_api_paid_name: str

@@ -1,19 +1,31 @@
 from fastapi import APIRouter
 
 from models.League import League
-from utilities import create_mapping_table
+from utilities import create_mapping_table_odds_to_footapifree
 
 router = APIRouter()
 
 leagues = [
-    League(**{"league": "La liga", "api_key": "soccer_spain_la_liga", "api_id": 2014}),
-    League(**{"league": "Premier League", "api_key": "soccer_england_league1", "api_id": 2021}),
-    League(**{"league": "Bundesliga", "api_key": "soccer_germany_bundesliga", "api_id": 2002}),
-    League(**{"league": "Serie A", "api_key": "soccer_italy_serie_a", "api_id": 2019})
+    League(**{"name": "La liga", "odds_api_id":
+        "soccer_spain_la_liga",
+              "foot_api_free_id": 2014,
+
+              "foot_api_paid_name": "Spain"
+              }),
+    League(**{"name": "Premier League",
+              "foot_api_paid_name": "England",
+              "odds_api_id": "soccer_england_league1", "foot_api_free_id": 2021}),
+    League(**{"name": "Bundesliga", "odds_api_id": "soccer_germany_bundesliga",
+              "foot_api_paid_name": "Germany",
+              "foot_api_free_id": 2002}),
+    League(**{"name": "Serie A", "odds_api_id": "soccer_italy_serie_a", "foot_api_free_id": 2019,
+              "foot_api_paid_name": "Italy"}),
+    League(**{"name": "Ligue 1", "odds_api_id": "soccer_france_ligue_one", "foot_api_free_id": 2015,
+              "foot_api_paid_name": "France"}),
 ]
 
 
-@router.get("leagues")
+@router.get("/leagues")
 async def get_leagues():
     """
     Get the list of leagues
@@ -25,6 +37,7 @@ async def get_leagues():
         }
     }
 
+
 @router.post("/mapping-table")
 async def get_mapping_table(leagues: list[League]):
     """
@@ -32,7 +45,7 @@ async def get_mapping_table(leagues: list[League]):
     :param leagues: the list of leagues to compare
     :return: the mapping table in a dict
     """
-    mapping_table = create_mapping_table(leagues)
+    mapping_table = create_mapping_table_odds_to_footapifree(leagues)
     return {
         "detail": {
             "mapping_table": mapping_table,
