@@ -1,6 +1,7 @@
 from datetime import datetime
 from pprint import pprint
 
+import cachetools
 import requests
 from fuzzywuzzy import fuzz
 
@@ -13,7 +14,7 @@ leagues = [
     # {"league": "Bundesliga", "api_key": "soccer_germany_bundesliga", "api_id": 2002},
     League(**{"league": "Serie A", "api_key": "soccer_italy_serie_a", "api_id": 2019})
 ]
-
+cache = cachetools.TTLCache(maxsize=100, ttl=86400)  # 86400 secondes = 1 jour
 
 def get_api_odds_teams(ligue: str):
     API_KEY = '1c4d52bcc762be6253526a6cb2179978'
@@ -63,7 +64,7 @@ def create_mapping_table(leagues: list[League]):
     return mapping_table
 
 
-def get_history_data(teams_id: str):
+def get_history_data(teams_id: str) -> list[dict]:
     url = f"https://api.football-data.org/v4/teams/{teams_id}/matches?status=FINISHED"
 
     headers = {
@@ -80,4 +81,4 @@ def get_history_data(teams_id: str):
 if __name__ == "__main__":
     # data = get_history_data('78')
     # pprint(data[0])
-    pprint(MatchAPI.summary('78'))
+    pprint(MatchAPI.summary(78))
