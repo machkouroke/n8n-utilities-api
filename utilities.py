@@ -58,7 +58,7 @@ def create_mapping_table_odds_to_footapifree(leagues: list[League]):
     return mapping_table
 
 
-def create_mapping_table_odds_to_footapipaid(leagues: list[League]):
+def create_mapping_table_footapifree_to_footapipaid(leagues: list[League]):
     foot_api_paid_teams = json.load(open('data/filtered_teams.json', encoding='utf-8'))
     mapping_table = {}
     for league in leagues:
@@ -80,10 +80,7 @@ def create_mapping_table_odds_to_footapipaid(leagues: list[League]):
                     highest_ratio = ratio_short
                     best_match = foot_api_paid_team_ligue
             if highest_ratio >= 40:
-                mapping_table[foot_api_free_team['team_name']] = {
-                    "team_name": best_match,
-                    "highest_ratio": highest_ratio
-                }
+                mapping_table[foot_api_free_team['id']] = best_match['ID']
 
     return mapping_table
 
@@ -129,17 +126,17 @@ if __name__ == "__main__":
     # pprint(test)
     # print(len(test))
     # Get repartition of test by country size
-    countries = {}
-    for team in test:
-        country = test[team]['team_name']['Country']
-        if country not in countries:
-            countries[country] = []
-        countries[country].append(team)
-    # size of each country
-    for country in countries:
-        print(f"{country}: {len(countries[country])}")
-    # Display for each country the team that are in the get_api_football_teams response but not in the mapping_table
-    pprint(countries['France'])
+    # countries = {}
+    # for team in test:
+    #     country = test[team]['team_name']['Country']
+    #     if country not in countries:
+    #         countries[country] = []
+    #     countries[country].append(team)
+    # # size of each country
+    # for country in countries:
+    #     print(f"{country}: {len(countries[country])}")
+    # # Display for each country the team that are in the get_api_football_teams response but not in the mapping_table
+    pprint(test)
 
 
 
