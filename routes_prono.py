@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from models.League import League
-from utilities import create_mapping_table_odds_to_footapifree
+from models.Match import Match
 
 router = APIRouter()
 
@@ -9,8 +9,8 @@ leagues = [
     League(**{"name": "La liga", "odds_api_id":
         "soccer_spain_la_liga",
               "foot_api_free_id": 2014,
-
-              "foot_api_paid_name": "Spain"
+              "foot_api_paid_name": "Spain",
+              "foot_api_paid_id": 2014
               }),
     League(**{"name": "Premier League",
               "foot_api_paid_name": "England",
@@ -38,30 +38,22 @@ async def get_leagues():
     }
 
 
-@router.post("/mapping-table")
-async def get_mapping_table(leagues: list[League]):
+@router.post("/predict")
+async def get_predictions(match: list[Match]):
     """
     Get the mapping table of the teams between the odds API and the football API
-    :param leagues: the list of leagues to compare
+    :param match:
     :return: the mapping table in a dict
     """
-    mapping_table = create_mapping_table_odds_to_footapifree(leagues)
+    mapping_table_odds_to_free = Match.create_mapping_table_odds_to_foot_api_free(leagues)
+    mapping_table_free_to_paid = Match.create_mapping_table_foot_api_free_to_foot_api_paid(leagues)
+    new_match = []
+    for match in match:
+        match_fixture_id = match.get_fixture(mapping_table_odds_to_free, mapping_table_free_to_paid)
+        match.set_prediction(match_fixture_id)
+        new_match.append(match)
     return {
         "detail": {
-            "mapping_table": mapping_table,
-            "nb_teams_mapped": len(mapping_table)
-        }
-    }
-
-
-@router.get('/historical-data')
-async def get_historical_data(home_team_id: int, away_team_id: int):
-    """
-    Get the historical data of the matches
-    :return: the historical data
-    """
-    return {
-        "detail": {
-
+            "match": new_match
         }
     }

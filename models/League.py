@@ -6,3 +6,4 @@ class League(BaseModel):
     odds_api_id: str
     foot_api_free_id: int
     foot_api_paid_name: str
+
