@@ -5,11 +5,13 @@ from pprint import pprint
 from typing import Optional
 
 import requests
+from cachetools import cached
 from fuzzywuzzy import fuzz
 from pydantic import BaseModel
 
 from models.League import League
-from utilities import get_api_odds_teams, get_api_football_teams_free
+from models.global_variable import cache
+from utilities import get_api_odds_teams
 
 
 class Form(enum.Enum):
@@ -94,13 +96,14 @@ class Match(BaseModel):
         return float(percent.replace('%', '')) / 100
 
     @staticmethod
-    def create_mapping_table_odds_to_foot_api_paid(leagues: list[League]) -> dict[str, int]:
+    @cached(cache)
+    def create_mapping_table_odds_to_foot_api_paid(leagues: tuple[League]) -> dict[str, int]:
         """
         Create a mapping table between the teams of the odds API and the football API
         :param leagues:  the list of leagues to compare
         :return: the mapping table
         """
-        foot_api_paid_teams = json.load(open('./data/filtered_teams.json', encoding='utf-8'))
+        foot_api_paid_teams = json.load(open('../data/filtered_teams.json', encoding='utf-8'))
         mapping_table = {}
         for league in leagues:
             odds_teams = get_api_odds_teams(league.odds_api_id)
@@ -123,7 +126,7 @@ class Match(BaseModel):
 
         return {v: k for k, v in mapping_table.items()}
 
-    def get_odd_to_foot_api_paid_id(self, mapping_table_odd_to_paid: dict[str, int],) -> dict[str, int]:
+    def get_odd_to_foot_api_paid_id(self, mapping_table_odd_to_paid: dict[str, int], ) -> dict[str, int]:
         return {
             "home_team_id": mapping_table_odd_to_paid[self.home_team],
             "away_team_id": mapping_table_odd_to_paid[self.away_team]
@@ -162,7 +165,7 @@ class Match(BaseModel):
 if __name__ == "__main__":
     # data = get_history_data('78')
     # pprint(data[0])
-    leagues = [
+    leagues = (
         League(**{"name": "La liga", "odds_api_id": "soccer_spain_la_liga",
                   "foot_api_free_id": 2014,
 
@@ -178,7 +181,7 @@ if __name__ == "__main__":
                   "foot_api_paid_name": "Italy"}),
         League(**{"name": "Ligue 1", "odds_api_id": "soccer_france_ligue_one", "foot_api_free_id": 2015,
                   "foot_api_paid_name": "France"}),
-    ]
+    )
     match = [
         {
             "id": "34b834fcc1c0e0a2284d7b6c05df975d",
@@ -1488,6 +1491,11 @@ if __name__ == "__main__":
     mapping_table_odds_to_free = Match.create_mapping_table_odds_to_foot_api_paid(leagues)
     pprint(mapping_table_odds_to_free)
     print(len(mapping_table_odds_to_free))
+
+    mapping_table_odds_to_free = Match.create_mapping_table_odds_to_foot_api_paid(leagues)
+    pprint(mapping_table_odds_to_free)
+    print(len(mapping_table_odds_to_free))
+
 
     foot_api_paid_teams = json.load(open('../data/filtered_teams.json', encoding='utf-8'))
     old = [{'ID': 80, 'Name': 'Olympique Lyonnais', 'Country': 'France', 'League': 'Ligue 1'},

@@ -5,7 +5,7 @@ from models.Match import Match
 
 router = APIRouter()
 
-leagues = [
+leagues = (
     League(**{"name": "La liga", "odds_api_id":
         "soccer_spain_la_liga",
               "foot_api_free_id": 2014,
@@ -22,7 +22,7 @@ leagues = [
               "foot_api_paid_name": "Italy"}),
     League(**{"name": "Ligue 1", "odds_api_id": "soccer_france_ligue_one", "foot_api_free_id": 2015,
               "foot_api_paid_name": "France"}),
-]
+)
 
 
 @router.get("/leagues")
