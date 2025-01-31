@@ -39,21 +39,23 @@ async def get_leagues():
 
 
 @router.post("/predict")
-async def get_predictions(match: list[Match]):
+async def get_predictions(matchs: list[Match]):
     """
     Get the mapping table of the teams between the odds API and the football API
-    :param match:
+    :param matchs:
     :return: the mapping table in a dict
     """
-    mapping_table_odds_to_free = Match.create_mapping_table_odds_to_foot_api_free(leagues)
-    mapping_table_free_to_paid = Match.create_mapping_table_foot_api_free_to_foot_api_paid(leagues)
+    mapping_table_odds_to_paid = Match.create_mapping_table_odds_to_foot_api_paid(leagues)
     new_match = []
-    for match in match:
-        match_fixture_id = match.get_fixture(mapping_table_odds_to_free, mapping_table_free_to_paid)
-        match.set_prediction(match_fixture_id)
-        new_match.append(match)
+    for match in matchs:
+        match_fixture_id = match.get_fixture(mapping_table_odds_to_paid)
+        if match_fixture_id != -1:
+            match.set_prediction(match_fixture_id)
+            new_match.append(match)
     return {
         "detail": {
-            "match": new_match
+            "match": new_match,
+            'number_of_matches': len(new_match),
+            'old_number_of_matches': len(matchs)
         }
     }

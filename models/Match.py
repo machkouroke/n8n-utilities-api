@@ -94,90 +94,49 @@ class Match(BaseModel):
         return float(percent.replace('%', '')) / 100
 
     @staticmethod
-    def create_mapping_table_odds_to_foot_api_free(leagues: list[League]) -> dict[str, str]:
+    def create_mapping_table_odds_to_foot_api_paid(leagues: list[League]) -> dict[str, int]:
         """
         Create a mapping table between the teams of the odds API and the football API
         :param leagues:  the list of leagues to compare
         :return: the mapping table
         """
+        foot_api_paid_teams = json.load(open('./data/filtered_teams.json', encoding='utf-8'))
         mapping_table = {}
         for league in leagues:
             odds_teams = get_api_odds_teams(league.odds_api_id)
-            football_teams = get_api_football_teams_free(league.foot_api_free_id)
-            for odds_team in odds_teams:
-                best_match = None
-                highest_ratio = 0
-                for football_team in football_teams:
-                    # Comparaison avec le nom complet
-                    ratio_full = fuzz.ratio(odds_team['team_name'].lower(), football_team['team_name'].lower())
-                    # Comparaison avec le nom abrégé
-                    ratio_short = fuzz.ratio(odds_team['team_name'].lower(), football_team['short_name'].lower())
-                    # Sélection du meilleur ratio
-                    if ratio_full > highest_ratio:
-                        highest_ratio = ratio_full
-                        best_match = football_team
-                    if ratio_short > highest_ratio:
-                        highest_ratio = ratio_short
-                        best_match = football_team
-                if highest_ratio > 70:
-                    mapping_table[odds_team['team_name']] = best_match['team_name']
-        return mapping_table
-
-    @staticmethod
-    def create_mapping_table_foot_api_free_to_foot_api_paid(leagues: list[League]) -> dict[str, int]:
-        """
-        Create a mapping table between the teams of the football API free and the football API paid
-        :param leagues:  the list of leagues to compare
-        :return: the mapping table
-        """
-        foot_api_paid_teams = json.load(open('../data/filtered_teams.json', encoding='utf-8'))
-        mapping_table = {}
-        for league in leagues:
-            foot_api_free_teams = get_api_football_teams_free(league.foot_api_free_id)
             foot_api_paid_team_ligues = list(
                 filter(lambda x: x['Country'] == league.foot_api_paid_name, foot_api_paid_teams))
-            for foot_api_free_team in foot_api_free_teams:
+            for foot_api_paid_team_ligue in foot_api_paid_team_ligues:
+                foot_api_paid_team_ligue_name = foot_api_paid_team_ligue['Name'].lower()
                 best_match = None
                 highest_ratio = 0
-                for foot_api_paid_team_ligue in foot_api_paid_team_ligues:
-                    foot_api_paid_team_ligue_name = foot_api_paid_team_ligue['Name'].lower()
+                for odds_team in odds_teams:
                     # Comparaison avec le nom complet
-                    ratio_full = fuzz.ratio(foot_api_paid_team_ligue_name, foot_api_free_team['team_name'].lower())
-                    # Comparaison avec le nom abrégé
-                    ratio_short = fuzz.ratio(foot_api_paid_team_ligue_name, foot_api_free_team['short_name'].lower())
-                    if ratio_full > highest_ratio:
-                        highest_ratio = ratio_full
-                        best_match = foot_api_paid_team_ligue
-                    if ratio_short > highest_ratio:
-                        highest_ratio = ratio_short
-                        best_match = foot_api_paid_team_ligue
-                if highest_ratio >= 40:
-                    mapping_table[foot_api_free_team['team_name']] = best_match['ID']
+                    ratio = fuzz.ratio(foot_api_paid_team_ligue_name, odds_team['team_name'].lower())
+                    # Sélection du meilleur ratio
+                    if ratio > highest_ratio:
+                        highest_ratio = ratio
+                        best_match = odds_team
 
-        return mapping_table
+                if highest_ratio > 60:
+                    mapping_table[foot_api_paid_team_ligue['ID']] = best_match['team_name']
 
-    def get_odd_to_foot_api_paid_id(self, mapping_table_odd_to_free: dict[str, str],
-                                    mapping_table_free_to_odd: dict[str, int]) -> dict[str, int]:
+        return {v: k for k, v in mapping_table.items()}
 
-        foot_api_free_id = {
-            "home_team_id": mapping_table_odd_to_free[self.home_team],
-            "away_team_id": mapping_table_odd_to_free[self.away_team]
-        }
+    def get_odd_to_foot_api_paid_id(self, mapping_table_odd_to_paid: dict[str, int],) -> dict[str, int]:
         return {
-            "home_team_id": mapping_table_free_to_odd[foot_api_free_id["home_team_id"]],
-            "away_team_id": mapping_table_free_to_odd[foot_api_free_id["away_team_id"]]
+            "home_team_id": mapping_table_odd_to_paid[self.home_team],
+            "away_team_id": mapping_table_odd_to_paid[self.away_team]
         }
 
-    def get_fixture(self, mapping_table_odd_to_free: dict[str, str],
-                    mapping_table_free_to_paid: dict[str, int]) -> int:
+    def get_fixture(self, mapping_table_odd_to_paid: dict[str, int]) -> int:
         """
         Get the fixture's id of the match between the home team and the away team
-        :param mapping_table_odd_to_free:
-        :param mapping_table_free_to_odd:
+        :param mapping_table_odd_to_paid:
 
         :return: the fixture's id of the match
         """
-        team_id = self.get_odd_to_foot_api_paid_id(mapping_table_odd_to_free, mapping_table_free_to_paid)
+        team_id = self.get_odd_to_foot_api_paid_id(mapping_table_odd_to_paid)
         url = (f"https://v3.football.api-sports.io"
                f"/fixtures/headtohead?h2h={team_id['home_team_id']}-"
                f"{team_id['away_team_id']}&date={datetime.now().strftime('%Y-%m-%d')}")
@@ -185,9 +144,9 @@ class Match(BaseModel):
             'x-rapidapi-key': 'dde76b3c11fa752b6e09335d54e072c5',
             'x-rapidapi-host': 'v3.football.api-sports.io'
         }
-        print(f'Getting fixture for {self.home_team} vs {self.away_team}')
         response = requests.request("GET", url, headers=headers)
-        print(response.json()['response'])
+        if not response.json()['response']:
+            return -1
         return response.json()['response'][0]['fixture']['id']
 
     def set_prediction(self, fixture_id: int) -> None:
@@ -1526,13 +1485,24 @@ if __name__ == "__main__":
             ]
         }
     ]
-    mapping_table_odds_to_free = Match.create_mapping_table_odds_to_foot_api_free(leagues)
-    mapping_table_free_to_paid = Match.create_mapping_table_foot_api_free_to_foot_api_paid(leagues)
-    new_match = []
-    for match in match:
-        actual_match = Match(**match)
-        match_fixture_id = actual_match.get_fixture(mapping_table_odds_to_free, mapping_table_free_to_paid)
-        actual_match.set_prediction(match_fixture_id)
-        new_match.append(actual_match)
+    mapping_table_odds_to_free = Match.create_mapping_table_odds_to_foot_api_paid(leagues)
+    pprint(mapping_table_odds_to_free)
+    print(len(mapping_table_odds_to_free))
 
-    pprint(new_match)
+    foot_api_paid_teams = json.load(open('../data/filtered_teams.json', encoding='utf-8'))
+    old = [{'ID': 80, 'Name': 'Olympique Lyonnais', 'Country': 'France', 'League': 'Ligue 1'},
+           {'ID': 51, 'Name': 'Brighton', 'Country': 'England', 'League': 'Premier League'}]
+    # Check team that are not in the mapping table
+    print("Teams that are not in the mapping table")
+    for team in foot_api_paid_teams:
+        if team['Name'] not in mapping_table_odds_to_free:
+            print(team)
+    # mapping_table_free_to_paid = Match.create_mapping_table_foot_api_free_to_foot_api_paid(leagues)
+    # new_match = []
+    # for match in match:
+    #     actual_match = Match(**match)
+    #     match_fixture_id = actual_match.get_fixture(mapping_table_odds_to_free, mapping_table_free_to_paid)
+    #     actual_match.set_prediction(match_fixture_id)
+    #     new_match.append(actual_match)
+    #
+    # pprint(new_match)

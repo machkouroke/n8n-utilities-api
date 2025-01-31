@@ -1,4 +1,7 @@
 from pprint import pprint
+from typing import Optional
+
+from pydantic import BaseModel
 
 top_leagues = {
     "France": {  # Source [2], [7], [11]
@@ -6,8 +9,8 @@ top_leagues = {
         "teams": {
             "Paris Saint Germain", "Marseille", "Olympique Lyonnais", "Lille",
             "Monaco", "Montpellier", "Nantes", "Nice", "Rennes",
-            "Strasbourg", "Lens", "Reims", "Toulouse", "Auxerre",
-            "Saint Etienne", "Angers", "LE Havre", "Stade Brestois 29"
+            "Strasbourg", "Lens", "Stade de Reims", "Toulouse", "Auxerre",
+            "Saint Etienne", "Angers", "LE Havre", "Brest"
         }
         # 18 équipes confirmées
     },
@@ -58,39 +61,59 @@ top_leagues = {
 }
 
 
-def filter_top_division_teams(data):
+class BaseTeam(BaseModel):
+    ID: int
+    Name: str
+    Country: str
+    League: Optional[str] = None
+
+    @staticmethod
+    def edit_name(data: list["BaseTeam"], name: str, new_name: str):
+        for team in data:
+            if team.Name == name:
+                team.Name = new_name
+                break
+        return data
+
+
+def filter_top_division_teams(data: list[BaseTeam]) -> list[BaseTeam]:
     # Liste pour stocker les équipes filtrées
     filtered_teams = []
 
     # Traitement de chaque équipe
     for team in data:
-        country = team.get("Country")
-        name = team.get("Name")
+        country = team.Country
+        name = team.Name
 
         # Vérifier si l'équipe appartient à un des 5 grands championnats
         if country in top_leagues and name in top_leagues[country]["teams"]:
-            filtered_teams.append({
-                "ID": team.get("ID"),
-                "Name": name,
-                "Country": country,
-                "League": top_leagues[country]["name"]
-            })
+            filtered_teams.append(BaseTeam(
+                ID=team.ID,
+                Name=name,
+                Country=country,
+                League=top_leagues[country]["name"]
+            ))
 
     return filtered_teams
-
 
 
 if __name__ == "__main__":
     import json
 
     with open('footapipaid.json', 'r', encoding='utf-8') as file:
-        data = json.load(file)
-
-    filtered_teams = filter_top_division_teams(data)
+        data: list[BaseTeam] = [BaseTeam(**team) for team in json.load(file)]
+    to_update = [
+        {"Stade Brestois 29": "Brest"},
+        {"Reims": "Stade de Reims"},
+    ]
+    for update in to_update:
+        for old_name, new_name in update.items():
+            data = BaseTeam.edit_name(data, old_name, new_name)
+    filtered_teams: list[BaseTeam] = filter_top_division_teams(data)
     # Group by country
     countries = {}
     for team in filtered_teams:
-        country = team.get("Country")
+        country = team.Country
         if country not in countries:
             countries[country] = []
         countries[country].append(team)
@@ -101,8 +124,10 @@ if __name__ == "__main__":
     for country in countries:
         print(f"{country}:")
         for team in top_leagues[country]["teams"]:
-            if team not in [t["Name"] for t in countries[country]]:
+            if team not in [t.Name for t in countries[country]]:
                 print(f"\t{team}")
 
     with open('filtered_teams.json', 'w', encoding='utf-8') as file:
-        json.dump(filtered_teams, file, ensure_ascii=False, indent=4)
+        json.dump([
+            team.model_dump() for team in filtered_teams
+        ], file, ensure_ascii=False, indent=4)
