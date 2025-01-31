@@ -103,7 +103,7 @@ class Match(BaseModel):
         :param leagues:  the list of leagues to compare
         :return: the mapping table
         """
-        foot_api_paid_teams = json.load(open('../data/filtered_teams.json', encoding='utf-8'))
+        foot_api_paid_teams = json.load(open('./data/filtered_teams.json', encoding='utf-8'))
         mapping_table = {}
         for league in leagues:
             odds_teams = get_api_odds_teams(league.odds_api_id)
@@ -126,11 +126,15 @@ class Match(BaseModel):
 
         return {v: k for k, v in mapping_table.items()}
 
-    def get_odd_to_foot_api_paid_id(self, mapping_table_odd_to_paid: dict[str, int], ) -> dict[str, int]:
-        return {
-            "home_team_id": mapping_table_odd_to_paid[self.home_team],
-            "away_team_id": mapping_table_odd_to_paid[self.away_team]
-        }
+    def get_odd_to_foot_api_paid_id(self, mapping_table_odd_to_paid: dict[str, int], ) -> dict[str, int] | None:
+        try:
+            return {
+                "home_team_id": mapping_table_odd_to_paid[self.home_team],
+                "away_team_id": mapping_table_odd_to_paid[self.away_team]
+            }
+        except KeyError:
+            return None
+
 
     def get_fixture(self, mapping_table_odd_to_paid: dict[str, int]) -> int:
         """
@@ -140,6 +144,8 @@ class Match(BaseModel):
         :return: the fixture's id of the match
         """
         team_id = self.get_odd_to_foot_api_paid_id(mapping_table_odd_to_paid)
+        if not team_id:
+            return -1
         url = (f"https://v3.football.api-sports.io"
                f"/fixtures/headtohead?h2h={team_id['home_team_id']}-"
                f"{team_id['away_team_id']}&date={datetime.now().strftime('%Y-%m-%d')}")
