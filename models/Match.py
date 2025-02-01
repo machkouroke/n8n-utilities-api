@@ -89,6 +89,7 @@ class Match(BaseModel):
     home_team: str
     away_team: str
     bookmakers: list[Bookmaker]
+    commence_time: datetime
     prediction: Optional[dict] = None
 
     @staticmethod
@@ -135,7 +136,6 @@ class Match(BaseModel):
         except KeyError:
             return None
 
-
     def get_fixture(self, mapping_table_odd_to_paid: dict[str, int]) -> int:
         """
         Get the fixture's id of the match between the home team and the away team
@@ -144,11 +144,13 @@ class Match(BaseModel):
         :return: the fixture's id of the match
         """
         team_id = self.get_odd_to_foot_api_paid_id(mapping_table_odd_to_paid)
+        print(f'{self.home_team} vs {self.away_team}: team_id')
+        print(team_id)
         if not team_id:
             return -1
         url = (f"https://v3.football.api-sports.io"
                f"/fixtures/headtohead?h2h={team_id['home_team_id']}-"
-               f"{team_id['away_team_id']}&date={datetime.now().strftime('%Y-%m-%d')}")
+               f"{team_id['away_team_id']}&date={self.commence_time.strftime('%Y-%m-%d')}")
         headers = {
             'x-rapidapi-key': 'dde76b3c11fa752b6e09335d54e072c5',
             'x-rapidapi-host': 'v3.football.api-sports.io'
@@ -1501,7 +1503,6 @@ if __name__ == "__main__":
     mapping_table_odds_to_free = Match.create_mapping_table_odds_to_foot_api_paid(leagues)
     pprint(mapping_table_odds_to_free)
     print(len(mapping_table_odds_to_free))
-
 
     foot_api_paid_teams = json.load(open('../data/filtered_teams.json', encoding='utf-8'))
     old = [{'ID': 80, 'Name': 'Olympique Lyonnais', 'Country': 'France', 'League': 'Ligue 1'},
