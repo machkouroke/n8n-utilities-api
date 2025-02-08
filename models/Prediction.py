@@ -43,10 +43,6 @@ class CompetitionTeamStat(BaseModel):
     loses: Repartition
     total_scored_goal: Repartition
     total_conceded_goal: Repartition
-    average_scored_goal: Repartition
-    average_conceded_goal: Repartition
-    goal_scored_under_over: dict
-    goal_conceded_under_over: dict
 
 
 class TeamStat(BaseModel):
@@ -63,9 +59,7 @@ class TeamComparaison(BaseModel):
 
 class Prediction(BaseModel):
     winner: PredictionWinner
-    goals: dict[str, float]
     advice: str
     probabilities: PredictionPercent
     home_team_stat: TeamStat
     away_team_stat: TeamStat
-    comparaison: TeamComparaison
