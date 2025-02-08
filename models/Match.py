@@ -109,7 +109,6 @@ class Match(BaseModel):
         if not response.json()['response']:
             raise NoPredictionError("No prediction found for this match")
         prediction = response.json()['response'][0]
-        print(response.json())
         winner = PredictionWinner(
             name=prediction['predictions']['winner']['name'],
             comment=prediction['predictions']['winner']['comment']
