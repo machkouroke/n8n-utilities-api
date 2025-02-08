@@ -13,7 +13,7 @@ class PredictionPercent(BaseModel):
 
 class PredictionWinner(BaseModel):
     name: str
-    comment: str
+    comment: Optional[str]
 
 
 class Goal(BaseModel):

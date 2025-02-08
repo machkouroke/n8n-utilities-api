@@ -5,7 +5,7 @@ import requests
 from fastapi import APIRouter
 
 from models.League import League
-from models.Match import Match
+from models.Match import Match, NoPredictionError
 from variable import API_SPORT_KEY
 
 router = APIRouter()
@@ -67,7 +67,7 @@ async def get_predictions(match: Match):
     :return: the mapping table in a dict
     """
     try:
-        match.set_prediction(match.fixture_id)
+        match.set_prediction()
         return match
-    except ValueError:
+    except NoPredictionError:
         return None

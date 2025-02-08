@@ -9,10 +9,13 @@ import requests
 from pydantic import BaseModel
 
 from models.Bookmaker import Bookmaker
-from models.League import League
 from models.Prediction import Prediction, PredictionWinner, PredictionPercent, TeamStat, Last5Matches, Goal, \
     CompetitionTeamStat, Repartition, TeamComparaison
 from variable import API_SPORT_KEY
+
+
+class NoPredictionError(Exception):
+    pass
 
 
 class Match(BaseModel):
@@ -104,8 +107,9 @@ class Match(BaseModel):
         }
         response = requests.request("GET", url, headers=headers)
         if not response.json()['response']:
-            raise ValueError("No prediction found")
+            raise NoPredictionError("No prediction found for this match")
         prediction = response.json()['response'][0]
+        print(response.json())
         winner = PredictionWinner(
             name=prediction['predictions']['winner']['name'],
             comment=prediction['predictions']['winner']['comment']
