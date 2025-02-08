@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 top_leagues = {
     "France": {  # Source [2], [7], [11]
-        "name": "Ligue 1",
+        "value": "Ligue 1",
         "teams": {
             "Paris Saint Germain", "Marseille", "Olympique Lyonnais", "Lille",
             "Monaco", "Montpellier", "Nantes", "Nice", "Rennes",
@@ -15,7 +15,7 @@ top_leagues = {
         # 18 équipes confirmées
     },
     "Spain": {  # Source [3], [8]
-        "name": "La Liga",
+        "value": "La Liga",
         "teams": {
             "Real Madrid", "Atletico Madrid", "Barcelona", "Athletic Club",
             "Villarreal", "Mallorca", "Real Sociedad", "Girona", "Real Betis",
@@ -26,7 +26,7 @@ top_leagues = {
         # 20 équipes confirmées
     },
     "England": {  # Source [4], [9]
-        "name": "Premier League",
+        "value": "Premier League",
         "teams": {
             "Liverpool", "Wolverhampton W", "Bournemouth", "Southampton",
             "Brighton", "Manchester City", "Crystal Palace", "Brentford",
@@ -37,7 +37,7 @@ top_leagues = {
         # 20 équipes confirmées
     },
     "Germany": {  # Source [5], [10]
-        "name": "Bundesliga",
+        "value": "Bundesliga",
         "teams": {
             "Bayern München", "Bayer Leverkusen", "Eintracht Frankfurt",
             "VfB Stuttgart", "RB Leipzig", "Borussia Dortmund",
@@ -49,7 +49,7 @@ top_leagues = {
         # 18 équipes confirmées
     },
     "Italy": {  # Source [6]
-        "name": "Serie A",
+        "value": "Serie A",
         "teams": {
             "Napoli", "Inter", "Atalanta", "Lazio", "Juventus",
             "Fiorentina", "AC Milan", "Bologna", "AS Roma", "Torino",
@@ -91,7 +91,7 @@ def filter_top_division_teams(data: list[BaseTeam]) -> list[BaseTeam]:
                 ID=team.ID,
                 Name=name,
                 Country=country,
-                League=top_leagues[country]["name"]
+                League=top_leagues[country]["value"]
             ))
 
     return filtered_teams
