@@ -19,14 +19,15 @@ class Bookmaker(BaseModel):
 
     @staticmethod
     def to_bookmaker(data: dict) -> 'Bookmaker':
+        to_exclude = {'Goals Over/Under First Half', 'Goals Over/Under - Second Half',
+                                 'Correct Score - First Half', 'Corners 1x2', 'Cards Over/Under',
+                                                                              'Handicap Result',
+                                 'Exact Score'}
         name = data["name"]
         bets = []
         for bet in data["bets"]:
             bet_name = bet["name"]
-            if (bet_name not in {'Goals Over/Under First Half', 'Goals Over/Under - Second Half',
-                                 'Correct Score - First Half', 'Corners 1x2', 'Cards Over/Under'
-                                                                              'Handicap Result',
-                                 'Exact Score'}) and (data["name"] == 'Unibet' or bet_name == 'Match Winner'):
+            if (bet_name not in to_exclude) and (data["name"] == 'Unibet' or bet_name == 'Match Winner'):
                 bet_outcome = []
 
                 for odd in bet["values"]:
