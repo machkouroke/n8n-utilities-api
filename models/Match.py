@@ -44,8 +44,7 @@ class Match(BaseModel):
         return TeamStat(
             last_5_matches_all_competitions=Last5Matches(
                 form=prediction_teams_data['last_5']['form'],
-                att=prediction_teams_data['last_5']['att'],
-                defn=prediction_teams_data['last_5']['def'],
+
                 scored_goal=Goal(total=float(prediction_teams_data['last_5']['goals']['for']['total']),
                                  average=float(prediction_teams_data['last_5']['goals']['for']['average'])),
                 conceded_goal=Goal(total=float(prediction_teams_data['last_5']['goals']['against']['total']),
@@ -53,9 +52,7 @@ class Match(BaseModel):
             ),
             actual_competition_stat=CompetitionTeamStat(
                 form=prediction_teams_data['league']['form'],
-                played=Repartition(home=float(prediction_teams_data['league']['fixtures']['played']['home']),
-                                   away=float(prediction_teams_data['league']['fixtures']['played']['away']),
-                                   total=float(prediction_teams_data['league']['fixtures']['played']['total'])),
+
                 wins=Repartition(home=float(prediction_teams_data['league']['fixtures']['wins']['home']),
                                  away=float(prediction_teams_data['league']['fixtures']['wins']['away']),
                                  total=float(prediction_teams_data['league']['fixtures']['wins']['total'])),

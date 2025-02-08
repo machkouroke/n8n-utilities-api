@@ -22,7 +22,8 @@ class Bookmaker(BaseModel):
         to_exclude = {'Goals Over/Under First Half', 'Goals Over/Under - Second Half',
                       'Correct Score - First Half', 'Corners 1x2', 'Cards Over/Under',
                       'Handicap Result', "Home Corners Over/Under", "Away Corners Over/Under",
-                      "Total Corners (1st Half)", "Corners Over Under",
+                      "Total Corners (1st Half)", "Corners Over Under", "Second Half Winner", "HT/FT Double",
+                      "Total - Home", "Total - Away",
                       'Exact Score'}
         name = data["name"]
         bets = []

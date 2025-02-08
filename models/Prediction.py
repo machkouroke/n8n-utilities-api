@@ -23,8 +23,6 @@ class Goal(BaseModel):
 
 class Last5Matches(BaseModel):
     form: str
-    att: str
-    defn: str
     conceded_goal: Goal
     scored_goal: Goal
 
@@ -37,7 +35,6 @@ class Repartition(BaseModel):
 
 class CompetitionTeamStat(BaseModel):
     form: str
-    played: Repartition
     wins: Repartition
     draws: Repartition
     loses: Repartition
