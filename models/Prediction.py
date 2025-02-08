@@ -58,7 +58,6 @@ class TeamComparaison(BaseModel):
     form: dict[str, str]
     att: dict[str, str]
     defn: dict[str, str]
-    goals: dict[str, str]
     total: dict[str, str]
 
 

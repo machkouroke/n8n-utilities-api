@@ -115,7 +115,6 @@ class Match(BaseModel):
             form=prediction['comparison']['form'],
             att=prediction['comparison']['att'],
             defn=prediction['comparison']['def'],
-            goals=prediction['comparison']['goals'],
             total=prediction['comparison']['total']
         )
         self.prediction = Prediction(
