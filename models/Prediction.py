@@ -1,10 +1,8 @@
-from pydantic import BaseModel
+import enum
+from typing import Optional
 
-
-class Form(enum.Enum):
-    W = "W"
-    D = "D"
-    L = "L"
+from pydantic import BaseModel, TypeAdapter
+from typing_extensions import TypeAliasType
 
 
 class PredictionPercent(BaseModel):
@@ -24,8 +22,9 @@ class Goal(BaseModel):
 
 
 class Last5Matches(BaseModel):
-    att: float
-    defn: float
+    form: str
+    att: str
+    defn: str
     conceded_goal: Goal
     scored_goal: Goal
 
@@ -37,7 +36,7 @@ class Repartition(BaseModel):
 
 
 class CompetitionTeamStat(BaseModel):
-    form: list[Form]
+    form: str
     played: Repartition
     wins: Repartition
     draws: Repartition
@@ -46,8 +45,35 @@ class CompetitionTeamStat(BaseModel):
     total_conceded_goal: Repartition
     average_scored_goal: Repartition
     average_conceded_goal: Repartition
+    goal_scored_minute_information: dict
+    goal_scored_under_over: dict
+    goal_conceded_minute_information: dict
+    goal_conceded_under_over: dict
+    clean_sheet_information: Repartition
+    biggest_information_stat: dict
+    failed_to_score_information: Repartition
 
 
 class TeamStat(BaseModel):
     last_5_matches_all_competitions: Last5Matches
     actual_competition_stat: CompetitionTeamStat
+
+
+class TeamComparaison(BaseModel):
+    form: dict[str, str]
+    att: dict[str, str]
+    defn: dict[str, str]
+    poisson_distribution: dict[str, str]
+    h2h: dict[str, str]
+    goals: dict[str, str]
+    total: dict[str, str]
+
+
+class Prediction(BaseModel):
+    winner: PredictionWinner
+    goals: dict[str, float]
+    advice: str
+    probabilities: PredictionPercent
+    home_team_stat: TeamStat
+    away_team_stat: TeamStat
+    comparaison: TeamComparaison

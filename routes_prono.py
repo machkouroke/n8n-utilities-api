@@ -58,31 +58,16 @@ def get_odd(leagues: list[League]):
         }
     }
 
-# @router.get("/leagues")
-# async def get_leagues():
-#     """
-#     Get the list of leagues
-#     :return: the list of leagues
-#     """
-#     return {
-#         "detail": {
-#             "leagues": leagues
-#         }
-#     }
 
-
-# @router.post("/predict")
-# async def get_predictions(match: Match):
-#     """
-#     Get the mapping table of the teams between the odds API and the football API
-#     :param match:
-#     :return: the mapping table in a dict
-#     """
-#     mapping_table_odds_to_paid = Match.create_mapping_table_odds_to_foot_api_paid(leagues)
-#     match_fixture_id = match.get_fixture(mapping_table_odds_to_paid)
-#     print(match_fixture_id)
-#     if match_fixture_id != -1:
-#         match.set_prediction(match_fixture_id)
-#         return match
-#     else:
-#         return {}
+@router.post("/predict")
+async def get_predictions(match: Match):
+    """
+    Get the mapping table of the teams between the odds API and the football API
+    :param match:
+    :return: the mapping table in a dict
+    """
+    try:
+        match.set_prediction(match.fixture_id)
+        return match
+    except ValueError:
+        return None
