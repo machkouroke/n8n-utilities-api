@@ -1,5 +1,4 @@
-import enum
-import json
+
 from datetime import datetime
 from pprint import pprint
 from typing import Optional
@@ -83,19 +82,9 @@ class Match(BaseModel):
                     home=float(prediction_teams_data['league']['goals']['against']['average']['home']),
                     away=float(prediction_teams_data['league']['goals']['against']['average']['away']),
                     total=float(prediction_teams_data['league']['goals']['against']['average']['total'])),
-                goal_scored_minute_information=prediction_teams_data['league']['goals']['for']['minute'],
                 goal_scored_under_over=prediction_teams_data['league']['goals']['for']['under_over'],
-                goal_conceded_minute_information=prediction_teams_data['league']['goals']['against']['minute'],
                 goal_conceded_under_over=prediction_teams_data['league']['goals']['against']['under_over'],
-                clean_sheet_information=Repartition(
-                    home=float(prediction_teams_data['league']['clean_sheet']['home']),
-                    away=float(prediction_teams_data['league']['clean_sheet']['away']),
-                    total=float(prediction_teams_data['league']['clean_sheet']['total'])),
-                biggest_information_stat=prediction_teams_data['league']['biggest'],
-                failed_to_score_information=Repartition(
-                    home=float(prediction_teams_data['league']['failed_to_score']['home']),
-                    away=float(prediction_teams_data['league']['failed_to_score']['away']),
-                    total=float(prediction_teams_data['league']['failed_to_score']['total']))
+
             )
         )
 
@@ -126,8 +115,6 @@ class Match(BaseModel):
             form=prediction['comparison']['form'],
             att=prediction['comparison']['att'],
             defn=prediction['comparison']['def'],
-            poisson_distribution=prediction['comparison']['poisson_distribution'],
-            h2h=prediction['comparison']['h2h'],
             goals=prediction['comparison']['goals'],
             total=prediction['comparison']['total']
         )

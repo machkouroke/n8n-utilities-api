@@ -45,13 +45,8 @@ class CompetitionTeamStat(BaseModel):
     total_conceded_goal: Repartition
     average_scored_goal: Repartition
     average_conceded_goal: Repartition
-    goal_scored_minute_information: dict
     goal_scored_under_over: dict
-    goal_conceded_minute_information: dict
     goal_conceded_under_over: dict
-    clean_sheet_information: Repartition
-    biggest_information_stat: dict
-    failed_to_score_information: Repartition
 
 
 class TeamStat(BaseModel):
@@ -63,8 +58,6 @@ class TeamComparaison(BaseModel):
     form: dict[str, str]
     att: dict[str, str]
     defn: dict[str, str]
-    poisson_distribution: dict[str, str]
-    h2h: dict[str, str]
     goals: dict[str, str]
     total: dict[str, str]
 
