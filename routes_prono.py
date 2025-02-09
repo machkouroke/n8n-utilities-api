@@ -2,7 +2,7 @@ from datetime import datetime
 from pprint import pprint
 
 import requests
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 from models.League import League
 from models.Match import Match, NoPredictionError
@@ -31,9 +31,10 @@ router = APIRouter()
 # )
 
 @router.post("/odds")
-def get_odd(leagues: list[League]):
+def get_odd(leagues: list[League], date: str = Query(..., regex=r"^\d{4}-\d{2}-\d{2}$")):
     """
     Get the odds of a match
+    :param date:
     :param leagues:
     :return: the odds of the match
     """
@@ -44,7 +45,7 @@ def get_odd(leagues: list[League]):
         'x-rapidapi-host': 'v3.football.api-sports.io'
     }
     for league in leagues:
-        querystring = {"league": league.api_sport, "season": league.season, "date": datetime.now().strftime("%Y-%m-%d")}
+        querystring = {"league": league.api_sport, "season": league.season, "date": date}
         response = requests.request("GET", url, headers=headers, params=querystring)
         matchs_data = response.json()["response"]
         for match in matchs_data:
