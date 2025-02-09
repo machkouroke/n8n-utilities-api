@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from models.Bookmaker import Bookmaker
 from models.Prediction import Prediction, PredictionWinner, PredictionPercent, TeamStat, Last5Matches, Goal, \
-    CompetitionTeamStat, Repartition
+    CompetitionTeamStat, Repartition, TeamComparaison
 from variable import API_SPORT_KEY
 
 
@@ -44,7 +44,8 @@ class Match(BaseModel):
         return TeamStat(
             last_5_matches_all_competitions=Last5Matches(
                 form=prediction_teams_data['last_5']['form'],
-
+                att=prediction_teams_data['last_5']['att'],
+                defn=prediction_teams_data['last_5']['def'],
                 scored_goal=Goal(total=float(prediction_teams_data['last_5']['goals']['for']['total']),
                                  average=float(prediction_teams_data['last_5']['goals']['for']['average'])),
                 conceded_goal=Goal(total=float(prediction_teams_data['last_5']['goals']['against']['total']),
@@ -52,7 +53,9 @@ class Match(BaseModel):
             ),
             actual_competition_stat=CompetitionTeamStat(
                 form=prediction_teams_data['league']['form'],
-
+                played=Repartition(home=float(prediction_teams_data['league']['fixtures']['played']['home']),
+                                   away=float(prediction_teams_data['league']['fixtures']['played']['away']),
+                                   total=float(prediction_teams_data['league']['fixtures']['played']['total'])),
                 wins=Repartition(home=float(prediction_teams_data['league']['fixtures']['wins']['home']),
                                  away=float(prediction_teams_data['league']['fixtures']['wins']['away']),
                                  total=float(prediction_teams_data['league']['fixtures']['wins']['total'])),
@@ -70,8 +73,27 @@ class Match(BaseModel):
                     home=float(prediction_teams_data['league']['goals']['against']['total']['home']),
                     away=float(prediction_teams_data['league']['goals']['against']['total']['away']),
                     total=float(prediction_teams_data['league']['goals']['against']['total']['total'])),
-
-
+                average_scored_goal=Repartition(
+                    home=float(prediction_teams_data['league']['goals']['for']['average']['home']),
+                    away=float(prediction_teams_data['league']['goals']['for']['average']['away']),
+                    total=float(prediction_teams_data['league']['goals']['for']['average']['total'])),
+                average_conceded_goal=Repartition(
+                    home=float(prediction_teams_data['league']['goals']['against']['average']['home']),
+                    away=float(prediction_teams_data['league']['goals']['against']['average']['away']),
+                    total=float(prediction_teams_data['league']['goals']['against']['average']['total'])),
+                goal_scored_minute_information=prediction_teams_data['league']['goals']['for']['minute'],
+                goal_scored_under_over=prediction_teams_data['league']['goals']['for']['under_over'],
+                goal_conceded_minute_information=prediction_teams_data['league']['goals']['against']['minute'],
+                goal_conceded_under_over=prediction_teams_data['league']['goals']['against']['under_over'],
+                clean_sheet_information=Repartition(
+                    home=float(prediction_teams_data['league']['clean_sheet']['home']),
+                    away=float(prediction_teams_data['league']['clean_sheet']['away']),
+                    total=float(prediction_teams_data['league']['clean_sheet']['total'])),
+                biggest_information_stat=prediction_teams_data['league']['biggest'],
+                failed_to_score_information=Repartition(
+                    home=float(prediction_teams_data['league']['failed_to_score']['home']),
+                    away=float(prediction_teams_data['league']['failed_to_score']['away']),
+                    total=float(prediction_teams_data['league']['failed_to_score']['total']))
             )
         )
 
@@ -97,13 +119,21 @@ class Match(BaseModel):
         )
         home_team = Match.get_teams_stat(prediction['teams']['home'])
         away_team = Match.get_teams_stat(prediction['teams']['away'])
-
+        comparaison = TeamComparaison(
+            form=prediction['comparison']['form'],
+            att=prediction['comparison']['att'],
+            defn=prediction['comparison']['def'],
+            h2h=prediction['comparison']['h2h'],
+            goals=prediction['comparison']['goals'],
+            total=prediction['comparison']['total']
+        )
         self.prediction = Prediction(
             winner=winner,
             advice=advice,
             probabilities=probabilities,
             home_team_stat=home_team,
             away_team_stat=away_team,
+            comparaison=comparaison
         )
         if not self.home_team:
             self.home_team = prediction['teams']['home']['name']

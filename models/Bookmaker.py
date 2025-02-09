@@ -19,11 +19,11 @@ class Bookmaker(BaseModel):
 
     @staticmethod
     def to_bookmaker(data: dict) -> 'Bookmaker':
-        to_exclude = {'Goals Over/Under First Half', 'Goals Over/Under - Second Half',
+        to_exclude = {'Goals Over/Under First Half',
                       'Correct Score - First Half', 'Corners 1x2', 'Cards Over/Under',
                       'Handicap Result', "Home Corners Over/Under", "Away Corners Over/Under",
                       "Total Corners (1st Half)", "Corners Over Under", "Second Half Winner", "HT/FT Double",
-                      "Total - Home", "Total - Away",
+
                       'Exact Score'}
         name = data["name"]
         bets = []
