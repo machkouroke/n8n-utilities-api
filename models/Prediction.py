@@ -35,11 +35,7 @@ class Repartition(BaseModel):
 
 class CompetitionTeamStat(BaseModel):
     form: str
-    wins: Repartition
-    draws: Repartition
-    loses: Repartition
-    total_scored_goal: Repartition
-    total_conceded_goal: Repartition
+
 
 
 class TeamStat(BaseModel):
