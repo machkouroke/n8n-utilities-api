@@ -1,6 +1,3 @@
-from datetime import datetime
-from pprint import pprint
-
 import requests
 from fastapi import APIRouter, Query
 
@@ -10,25 +7,6 @@ from variable import API_SPORT_KEY
 
 router = APIRouter()
 
-
-# leagues = (
-#     League(**{"value": "La liga", "odds_api_id":
-#         "soccer_spain_la_liga",
-#               "foot_api_free_id": 2014,
-#               "foot_api_paid_name": "Spain",
-#               "foot_api_paid_id": 2014
-#               }),
-#     League(**{"value": "Premier League",
-#               "foot_api_paid_name": "England",
-#               "odds_api_id": "soccer_england_league1", "foot_api_free_id": 2021}),
-#     League(**{"value": "Bundesliga", "odds_api_id": "soccer_germany_bundesliga",
-#               "foot_api_paid_name": "Germany",
-#               "foot_api_free_id": 2002}),
-#     League(**{"value": "Serie A", "odds_api_id": "soccer_italy_serie_a", "foot_api_free_id": 2019,
-#               "foot_api_paid_name": "Italy"}),
-#     League(**{"value": "Ligue 1", "odds_api_id": "soccer_france_ligue_one", "foot_api_free_id": 2015,
-#               "foot_api_paid_name": "France"}),
-# )
 
 @router.post("/odds")
 def get_odd(leagues: list[League], date: str = Query(..., regex=r"^\d{4}-\d{2}-\d{2}$")):
