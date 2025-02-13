@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "comparestring"
+name = "n8n-api"
 version = "0.1.0"
 description = ""
 authors = ["machkouroke <machkour20.mo1@gmail.com>"]
@@ -16,6 +16,8 @@ cachetools = "^5.5.1"
 tqdm = "^4.67.1"
 jinja2 = "^3.1.5"
 pymongo = "^4.11.1"
+pydantic = {extras = ["dotenv"], version = "^2.10.6"}
+python-dotenv = "^1.0.1"
 
 
 

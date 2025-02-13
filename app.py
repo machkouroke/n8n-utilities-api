@@ -2,9 +2,7 @@ from traceback import print_exception
 from urllib.request import Request
 import uvicorn
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from jinja2 import Environment, FileSystemLoader
 from starlette.responses import Response
 
 import routes_prono

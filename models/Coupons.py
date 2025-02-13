@@ -29,11 +29,11 @@ class Coupons(BaseModel):
 class CouponsData(Model):
     coupons: list[Coupons]
     global_advice: str
-    date_of_match: str
+    date_of_match: Optional[str] = None
 
     @classmethod
     def find_one(cls, database: Database, date_of_match: str):
-        if result := database.Schools.find_one({"date_of_match": date_of_match}):
+        if result := database.Coupons.find_one({"date_of_match": date_of_match}):
             # Exclude _id from the result
 
             return CouponsData(**result)
@@ -53,8 +53,8 @@ class CouponsData(Model):
 
     def save_or_update(self):
         data = self.to_bson()
-        if self.database.CouponsData.find_one({"date_of_match": self.date_of_match}):
-            self.database.CouponsData.update_one({"date_of_match": self.date_of_match}, {"$set": data})
+        if self.database.Coupons.find_one({"date_of_match": self.date_of_match}):
+            self.database.Coupons.update_one({"date_of_match": self.date_of_match}, {"$set": data})
         else:
-            result = self.database.CouponsData.insert_one(data)
+            result = self.database.Coupons.insert_one(data)
             self.id = PydanticObjectId(result.inserted_id)

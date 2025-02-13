@@ -11,12 +11,11 @@ class Model(BaseModel):
     id: Optional[PydanticObjectId] = Field(None, alias="_id")
     database: Optional[Any] = None
 
-    def dict(self, *args, **kwargs):
-        kwargs["exclude"] = kwargs.get("exclude", set()) | {"database"}
-        properties = [prop_name for prop_name, prop in inspect.getmembers(self.__class__) if isinstance(prop, property)]
-        for prop in properties:
-            getattr(self, prop)
-        return Model.convert_values(super().dict(*args, **kwargs))
+    def model_dump(self, *args, **kwargs):
+
+        kwargs["exclude"] = (kwargs.get("exclude", set()) or set()) | {"database"}
+        return super().model_dump(*args, **kwargs)
+
 
     def set_db(self, database):
         self.database = database

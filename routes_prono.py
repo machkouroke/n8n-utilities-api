@@ -20,13 +20,12 @@ environment = Environment(loader=FileSystemLoader("template/"))
 # Endpoint pour générer une image à partir d'un template HTML et de données
 @router.post("/coupon")
 def saveCoupon(data: CouponsData, db: Database = Depends(get_db)):
-    try:
-        data.database = db
-        data.date_of_match = datetime.now().isoformat()
-        data.save_or_update()
-        return data
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    data.database = db
+    # Date of now in format dd/mm/yyyy
+    data.date_of_match = datetime.now().strftime("%d/%m/%Y")
+    data.save_or_update()
+    return data
+
 
 
 @router.get("/coupon/{date_of_match}")
