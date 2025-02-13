@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Coupons de Paris</title>
+</head>
+<body>
+{% for coupon in collection.coupons %}
+<div class="coupon">
+    <div class="coupon-header">{{coupon.type}} - {{coupon.details}}</div>
+    <div class="odds">Cote: {{coupon.odds}}</div>
+    <div class="stake">Mise: {{coupon.stake * 100}}% de la bankroll</div>
+    <div class="events">
+        {% for event in coupon.events %}
+        <div class="event">
+            <strong>{{event.home_team}} vs {{event.away_team}}</strong><br>
+            Type: {{event.type}} - {{event.details}}<br>
+            Cote: {{event.odds}}
+        </div>
+        {% endfor %}
+    </div>
+    <div class="advice">🔹 {{coupon.advice}}</div>
+</div>
+{% endfor %}
+
+<div class="coupon">
+    <div class="coupon-header">Conseil Global</div>
+    <div class="advice">{{ collection.global_advice }}</div>
+</div>
+</body>
+</html>

@@ -1,15 +1,16 @@
-from fastapi import FastAPI
 from traceback import print_exception
 from urllib.request import Request
-
-from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import Response
-
 import uvicorn
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from jinja2 import Environment, FileSystemLoader
+from starlette.responses import Response
 
 import routes_prono
 
 app = FastAPI()
+
 
 
 async def catch_exceptions_middleware(request: Request, call_next):
@@ -19,6 +20,7 @@ async def catch_exceptions_middleware(request: Request, call_next):
         # you probably want some kind of logging here
         print_exception(e)
         return Response("Internal server error", status_code=500)
+
 
 app.middleware('http')(catch_exceptions_middleware)
 

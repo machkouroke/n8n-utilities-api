@@ -1,11 +1,41 @@
-import requests
-from fastapi import APIRouter, Query
+from datetime import datetime
 
+import requests
+from fastapi import APIRouter, Query, HTTPException, Depends
+from jinja2 import Template, Environment, FileSystemLoader
+from pydantic import BaseModel
+from pymongo.synchronous.database import Database
+
+from dependencies.db import get_db
+from models.Coupons import CouponsData
 from models.League import League
 from models.Match import Match, NoPredictionError
 from variable import API_SPORT_KEY
 
 router = APIRouter()
+
+environment = Environment(loader=FileSystemLoader("template/"))
+
+
+# Endpoint pour générer une image à partir d'un template HTML et de données
+@router.post("/coupon")
+def saveCoupon(data: CouponsData, db: Database = Depends(get_db)):
+    try:
+        data.database = db
+        data.date_of_match = datetime.now().isoformat()
+        data.save_or_update()
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/coupon/{date_of_match}")
+def getCoupon(date_of_match: str, db: Database = Depends(get_db)):
+    try:
+        coupon = CouponsData.find_one(db, date_of_match)
+        return coupon
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/odds")
