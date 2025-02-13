@@ -22,7 +22,7 @@ environment = Environment(loader=FileSystemLoader("template/"))
 def saveCoupon(data: CouponsData, db: Database = Depends(get_db)):
     data.database = db
     # Date of now in format dd/mm/yyyy
-    data.date_of_match = datetime.now().strftime("%d/%m/%Y")
+    data.date_of_match = datetime.now().strftime("%d-%m-%Y")
     data.save_or_update()
     return data
 
@@ -32,7 +32,15 @@ def saveCoupon(data: CouponsData, db: Database = Depends(get_db)):
 def getCoupon(date_of_match: str, db: Database = Depends(get_db)):
     try:
         coupon = CouponsData.find_one(db, date_of_match)
-        return coupon
+        extremum_date = CouponsData.get_extremum_date(db)
+        print(extremum_date)
+        return {
+            "detail": {
+                "coupon": coupon,
+                "max_date": extremum_date["date_plus_recente"],
+                "min_date": extremum_date["date_plus_ancienne"]
+            }
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

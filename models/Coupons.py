@@ -41,6 +41,19 @@ class CouponsData(Model):
             return None
 
     @classmethod
+    def get_extremum_date(cls, database: Database):
+        query = [{
+            "$group": {
+                "_id": None,
+                "date_plus_ancienne": {"$min": "$date_of_match"},
+                "date_plus_recente": {"$max": "$date_of_match"}
+            }
+        }
+        ]
+        result = database.Coupons.aggregate(query)
+        return next(result)
+
+    @classmethod
     def find_one_or_404(cls, database: Database, date_of_match: str):
         if result := cls.find_one(database, date_of_match):
             return result
